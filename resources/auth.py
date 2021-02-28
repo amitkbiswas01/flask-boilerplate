@@ -31,11 +31,11 @@ class SignupAPI(Resource):
                 mimetype="application/json",
             )
         except FieldDoesNotExist:
-            raise SchemaValidationError
+            return {"error": "Invalid data format."}, 400
         except NotUniqueError:
-            raise EmailAlreadyExistsError
+            return {"error": "Email already Exists."}, 400
         except Exception:
-            raise InternalServerError
+            return {"error": "Internal Server Error."}, 500
 
 
 class LoginAPI(Resource):
@@ -55,7 +55,9 @@ class LoginAPI(Resource):
                 identity=str(author.id), expires_delta=datetime.timedelta(days=7)
             )
             return {"token": access_token}, 200
-        except (UnauthorizedError, DoesNotExist):
-            raise UnauthorizedError
+        except (UnauthorizedError):
+            return {"error": "Unauthorized"}, 401
+        except DoesNotExist:
+            return {"error": "Email doesn't exist."}, 404
         except Exception:
-            raise InternalServerError
+            return {"error": "Internal Server error."}, 500

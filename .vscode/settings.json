@@ -5,6 +5,7 @@
     "dotenv",
     "envvar",
     "getenv",
+    "jsonify",
     "mongodb",
     "signup"
   ]

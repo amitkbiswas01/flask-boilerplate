@@ -42,16 +42,16 @@ class BookListAPI(Resource):
             author.update(push__books=book)
             author.save()
             return Response(
-                response=json.dumps(book),
+                response=json.dumps({"message": "Book created successfully."}),
                 status=201,
                 mimetype="application/json",
             )
         except (FieldDoesNotExist, ValidationError):
-            raise SchemaValidationError
+            return {"error": "Invalid data format."}, 400
         except NotUniqueError:
-            raise BookAlreadyExistsError
+            return {"error": "Book already Exists."}, 400
         except Exception:
-            raise InternalServerError
+            return {"error": "Internal Server Error."}, 500
 
 
 class BookAPI(Resource):
@@ -70,7 +70,7 @@ class BookAPI(Resource):
             raise InternalServerError
 
     @jwt_required()
-    def put(self, id):
+    def patch(self, id):
         try:
             body = request.get_json()
             Book.objects.get(id=id).update(**body)
@@ -80,11 +80,11 @@ class BookAPI(Resource):
                 mimetype="application/json",
             )
         except InvalidQueryError:
-            raise SchemaValidationError
+            return {"error": "Invalid data format."}, 400
         except DoesNotExist:
-            raise UpdatingBookError
+            return {"error": "Book doesn't Exists."}, 400
         except Exception:
-            raise InternalServerError
+            return {"error": "Internal Server Error."}, 500
 
     @jwt_required()
     def delete(self, id):
